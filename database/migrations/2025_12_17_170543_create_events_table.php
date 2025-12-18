@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->datetime('date'); 
-            $table->string('location');
             $table->string('image');
-            $table->string('status');
+            $table->integer('limit')->default(1);
+            $table->foreignId('user_id');
             $table->timestamps();
         });
     }

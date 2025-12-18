@@ -73,8 +73,6 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Event::class)
             ->withPivot([
-                'registration_method',
-                'registration_source',
                 'registered_at',
             ])
             ->withTimestamps();
