@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+/* DataTables length selector - hide default browser arrow */
+#dt-length-0,
+select[id^="dt-length-"],
+.dt-length select,
+select.dt-length {
+    width: 60px !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background-image: none !important;
+    background: white !important;
+}
+
+/* Hide default arrow in IE/Edge */
+#dt-length-0::-ms-expand,
+select[id^="dt-length-"]::-ms-expand,
+.dt-length select::-ms-expand {
+    display: none !important;
+}
+
+/* Additional webkit fixes */
+#dt-length-0::-webkit-inner-spin-button,
+#dt-length-0::-webkit-outer-spin-button,
+select[id^="dt-length-"]::-webkit-inner-spin-button,
+select[id^="dt-length-"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+/* Hide default arrow for select dropdowns */
+.select-dropdown,
+select.select-dropdown {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background-image: none !important;
+}
+
+/* Hide default arrow in IE/Edge */
+.select-dropdown::-ms-expand,
+select.select-dropdown::-ms-expand {
+    display: none !important;
+}
