@@ -6,6 +6,7 @@ use App\Models\Event;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+
 class EventSeeder extends Seeder
 {
     /**
@@ -165,4 +166,3 @@ class EventSeeder extends Seeder
         }
     }
 }
-

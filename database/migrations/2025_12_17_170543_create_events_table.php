@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->datetime('date'); 
+            $table->datetime('date');
             $table->string('image');
             $table->integer('limit')->default(1);
             $table->foreignId('user_id');

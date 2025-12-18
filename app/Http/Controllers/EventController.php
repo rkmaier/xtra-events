@@ -43,7 +43,7 @@ class EventController extends Controller
     public function manage(Request $request)
     {
         $userId = Auth::id();
-        
+
         $events = Event::withTrashed()
             ->where('user_id', $userId)
             ->withCount('attendees')
@@ -130,9 +130,9 @@ class EventController extends Controller
     public function restore($id)
     {
         $event = Event::withTrashed()->findOrFail($id);
-        
+
         $this->authorize('restore', $event);
-        
+
         $event->restore();
 
         return redirect()->route('events.manage')
@@ -150,7 +150,6 @@ class EventController extends Controller
             abort(403);
         }
 
-  
         if ($event->attendees()->where('user_id', $user->id)->exists()) {
             return back()->with('error', 'You are already registered for this event.');
         }
@@ -158,17 +157,15 @@ class EventController extends Controller
         // Use database transaction with row lock to prevent race conditions
         try {
             DB::transaction(function () use ($event, $user) {
-       
+
                 $lockedEvent = Event::lockForUpdate()->findOrFail($event->id);
 
-            
                 $currentAttendees = $lockedEvent->attendees()->count();
 
                 if ($lockedEvent->limit > 0 && $currentAttendees >= $lockedEvent->limit) {
                     throw new \Exception('This event is already full.');
                 }
 
-            
                 $lockedEvent->attendees()->syncWithoutDetaching([
                     $user->id => [
                         'registered_at' => now(),

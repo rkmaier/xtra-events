@@ -2,10 +2,7 @@
 
 use App\Http\Controllers\EventController;
 use App\Models\Event;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
 
 Route::get('/', [EventController::class, 'index'])->name('events.index');
 

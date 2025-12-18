@@ -36,8 +36,6 @@ class EventRegistrationNotification extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param  \App\Models\Event  $event
-     * @param  \App\Models\User  $attendee
      * @return void
      */
     public function __construct(Event $event, User $attendee)
@@ -55,7 +53,6 @@ class EventRegistrationNotification extends Mailable
     public function build()
     {
         return $this->markdown('emails.event-registration')
-            ->subject('New Registration for: ' . $this->event->name);
+            ->subject('New Registration for: '.$this->event->name);
     }
 }
-
