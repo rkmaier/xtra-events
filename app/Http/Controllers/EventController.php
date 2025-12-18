@@ -21,6 +21,7 @@ class EventController extends Controller
         $userId = Auth::id();
 
         $events = Event::withCount('attendees')
+            ->where('date', '>=', now())
             ->when($userId, function ($query) use ($userId) {
                 $query->withCount([
                     'attendees as is_registered' => function ($q) use ($userId) {
@@ -28,7 +29,7 @@ class EventController extends Controller
                     },
                 ]);
             })
-            ->orderBy('date', 'desc')
+            ->orderBy('date', 'asc')
             ->paginate($perPage)
             ->withQueryString();
 
