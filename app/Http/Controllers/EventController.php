@@ -7,6 +7,7 @@ use App\Mail\EventRegistrationNotification;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
@@ -147,31 +148,48 @@ class EventController extends Controller
         if (! $user) {
             abort(403);
         }
-      
-        $currentAttendees = $event->attendees()->count();
 
-        if ($event->limit > 0 && $currentAttendees >= $event->limit) {
-            return back()->with('error', 'This event is already full.');
+  
+        if ($event->attendees()->where('user_id', $user->id)->exists()) {
+            return back()->with('error', 'You are already registered for this event.');
         }
 
-        $event->attendees()->syncWithoutDetaching([
-            $user->id => [
-                'registered_at' => now(),
-            ],
-        ]);
+        // Use database transaction with row lock to prevent race conditions
+        try {
+            DB::transaction(function () use ($event, $user) {
+       
+                $lockedEvent = Event::lockForUpdate()->findOrFail($event->id);
 
-        // Send confirmation email to the user who registered
-        Mail::to($user->email)->send(
-            new EventRegistrationConfirmation($event, $user)
-        );
+            
+                $currentAttendees = $lockedEvent->attendees()->count();
 
-        // Send notification email to the event creator
-        if ($event->user_id && $event->user) {
-            Mail::to($event->user->email)->send(
-                new EventRegistrationNotification($event, $user)
+                if ($lockedEvent->limit > 0 && $currentAttendees >= $lockedEvent->limit) {
+                    throw new \Exception('This event is already full.');
+                }
+
+            
+                $lockedEvent->attendees()->syncWithoutDetaching([
+                    $user->id => [
+                        'registered_at' => now(),
+                    ],
+                ]);
+            });
+
+            // Send confirmation email to the user who registered
+            Mail::to($user->email)->send(
+                new EventRegistrationConfirmation($event->fresh(), $user)
             );
+
+            // Send notification email to the event creator
+            if ($event->user_id && $event->user) {
+                Mail::to($event->user->email)->send(
+                    new EventRegistrationNotification($event->fresh(), $user)
+                );
+            }
+
+            return back()->with('success', 'You have been registered for this event.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-     
-        return back()->with('success', 'You have been registered for this event.');
     }
 }
